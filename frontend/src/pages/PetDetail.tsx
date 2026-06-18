@@ -1,9 +1,10 @@
-import { Card, Descriptions, List, Space, Tabs, Timeline, Typography } from 'antd';
+import { Card, Col, Descriptions, List, Row, Space, Statistic, Tabs, Timeline, Typography } from 'antd';
 import { useParams } from 'react-router-dom';
 import { usePetDetail, usePetInsurance, usePetMedical, usePetVaccines } from '../hooks/usePets';
 import { PetAvatar } from '../components/common/PetAvatar';
 import { VaccineCalendar } from '../components/common/VaccineCalendar';
 import { StatusBadge } from '../components/common/StatusBadge';
+import { ExpenseOverviewChart } from '../components/charts/ExpenseOverviewChart';
 import { enumLabels } from '../constants/enums';
 import { formatCurrency, formatDate } from '../utils/format';
 
@@ -59,6 +60,34 @@ export default function PetDetail() {
                   </List.Item>
                 )}
               />
+            ),
+          },
+          {
+            key: 'expense',
+            label: '支出总览',
+            children: (
+              <Space direction="vertical" size={16} style={{ width: '100%' }}>
+                <Row gutter={16}>
+                  <Col xs={12} md={8}>
+                    <Card>
+                      <Statistic title="医疗总支出" value={medical.reduce((sum, r) => sum + Number(r.cost || 0), 0)} precision={2} prefix="¥" valueStyle={{ color: '#0f8b8d' }} />
+                    </Card>
+                  </Col>
+                  <Col xs={12} md={8}>
+                    <Card>
+                      <Statistic title="保费总支出" value={policies.reduce((sum, p) => sum + Number(p.premium || 0), 0)} precision={2} prefix="¥" valueStyle={{ color: '#e1a23a' }} />
+                    </Card>
+                  </Col>
+                  <Col xs={24} md={8}>
+                    <Card>
+                      <Statistic title="累计支出" value={medical.reduce((sum, r) => sum + Number(r.cost || 0), 0) + policies.reduce((sum, p) => sum + Number(p.premium || 0), 0)} precision={2} prefix="¥" valueStyle={{ color: '#7c6fef' }} />
+                    </Card>
+                  </Col>
+                </Row>
+                <Card title="月度支出趋势">
+                  <ExpenseOverviewChart records={medical} policies={policies} />
+                </Card>
+              </Space>
             ),
           },
         ]}
